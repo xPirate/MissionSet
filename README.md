@@ -1,25 +1,69 @@
-# MissionSet
-Development of an opensource, readily deployable, intelligence gathering and dissemination platform.
+MissionSet is an open-source, readily deployable platform for intelligence gathering and dissemination.
+The goal is to provide a flexible, modular system that can be quickly adapted to meet diverse operational needs.
 
-Milestones:
-    Core platform
-    Addon Modules - Medical, Radio, Mission, targets, etc
-    Turnkey docker Deployable
-    Access Management - Authentication with permissions
-    Document exporting - Templates for reporting
-    Email integration -Sending reports
-    Encryption
+📌 Current Development Milestones
+Core Platform
 
-Future state:
-    Baremetal Deployment - ISO
-    Android App
-    iPhone App
-    Data sharing between deployments
-    Wireguard for secure access - APP to Server and Server to Server
+Modular architecture with support for addon modules
 
+Initial modules:
 
-    
-    
-    
+Medical
 
+Radio
 
+Mission & target management
+
+Deployment
+
+Turnkey Docker deployment
+
+Access & Security
+
+Deployable access management
+
+Authentication with permission control
+
+Data & Reporting
+
+Document exporting
+
+Report templates
+
+Email integration
+
+Encrypted report sending
+
+🚀 Future Roadmap
+Deployment
+
+Bare-metal installation support
+
+Mobile Applications
+
+iOS and Android apps
+
+Secure data sharing between deployments
+
+Networking & Security
+
+WireGuard-based secure access
+
+Encrypted communications:
+
+App-to-server
+
+Server-to-server
+
+🛠 Tech Stack (Planned/Current)
+Containerization: Docker (future: bare-metal support)
+
+Security: WireGuard VPN, role-based authentication
+
+Data Exchange: Encrypted communication channels
+
+Integrations: Email and reporting tools
+
+🤝 Contributions
+We welcome contributions from developers, testers, and security researchers.
+Please submit issues or pull requests via GitHub.
