@@ -17,17 +17,29 @@
     </ul>
   </div>
 </div>
+
 <div class="card" style="margin-top:16px;">
   <h3>Reports per day (last 5 days)</h3>
   <canvas id="line"></canvas>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const pieLabels = {{ pie_labels_json | safe }};
   const pieValues = {{ pie_values_json | safe }};
   const lineLabels = {{ line_labels_json | safe }};
   const lineValues = {{ line_values_json | safe }};
-  new Chart(document.getElementById('pie'), {type:'pie', data:{labels:pieLabels, datasets:[{data:pieValues}]}, options:{plugins:{legend:{position:'bottom'}}}});
-  new Chart(document.getElementById('line'), {type:'line', data:{labels:lineLabels, datasets:[{data:lineValues, fill:false, tension:0.2}]}, options:{scales:{y:{beginAtZero:true, precision:0}}, plugins:{legend:{display:false}}}});
+
+  new Chart(document.getElementById('pie'), {
+    type: 'pie',
+    data: { labels: pieLabels, datasets: [{ data: pieValues }] },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+
+  new Chart(document.getElementById('line'), {
+    type: 'line',
+    data: { labels: lineLabels, datasets: [{ data: lineValues, fill: false, tension: 0.2 }] },
+    options: { scales: { y: { beginAtZero: true, precision: 0 } }, plugins: { legend: { display: false } } }
+  });
 </script>
 {% endblock %}

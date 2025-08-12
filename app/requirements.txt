@@ -4,3 +4,4 @@ Jinja2
 SQLAlchemy
 opensearch-py
 python-multipart
+passlib[bcrypt]

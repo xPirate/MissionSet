@@ -1,0 +1,27 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Profile</h2>
+  <form method="post" action="/profile">
+    <label>Name</label><input type="text" name="name" value="{{ prof.name }}" required>
+    <div class="row">
+      <div><label>Birthday</label><input type="date" name="birthday" value="{{ prof.birthday }}"></div>
+      <div><label>Blood type</label><input type="text" name="blood_type" value="{{ prof.blood_type }}" placeholder="O+, A-, etc."></div>
+    </div>
+    <div class="row">
+      <div><label>Team</label><input type="text" name="team" value="{{ prof.team }}"></div>
+      <div><label>Role</label><input type="text" name="team_role" value="{{ prof.team_role }}" placeholder="medic, comms, ..."></div>
+    </div>
+    <div class="row">
+      <div><label>Phone</label><input type="text" name="phone" value="{{ prof.phone }}"></div>
+      <div><label>Email</label><input type="email" name="email" value="{{ prof.email }}"></div>
+    </div>
+    <div class="row">
+      <div><label>Emergency Contact</label><input type="text" name="contact_name" value="{{ prof.contact_name }}"></div>
+      <div><label>Contact Phone</label><input type="text" name="contact_phone" value="{{ prof.contact_phone }}"></div>
+    </div>
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

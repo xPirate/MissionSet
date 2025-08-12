@@ -3,25 +3,35 @@
 {% block content %}
 <div class="card">
   <h2>Add Item</h2>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
   <form method="post" action="/data/new">
     <label>Title</label>
     <input type="text" name="title" required>
+
     <label>Author</label>
-    <input type="text" name="author" required>
+    <input type="text" value="{{ current_user_name }}" readonly>
+
     <div class="row">
-      <div><label>Start time</label><input type="datetime-local" name="start_time" required></div>
-      <div><label>End time</label><input type="datetime-local" name="end_time" required></div>
+      <div>
+        <label>Start time</label>
+        <input type="datetime-local" name="start_time" required>
+      </div>
+      <div>
+        <label>End time</label>
+        <input type="datetime-local" name="end_time" required>
+      </div>
     </div>
+
     <label>Description</label>
     <textarea name="description" rows="5"></textarea>
+
     <label>Labels</label>
     <div class="labels">
-      <label><input type="checkbox" name="labels" value="Recon"> Recon</label>
-      <label><input type="checkbox" name="labels" value="Mission"> Mission</label>
-      <label><input type="checkbox" name="labels" value="Medical"> Medical</label>
-      <label><input type="checkbox" name="labels" value="Emergency"> Emergency</label>
-      <label><input type="checkbox" name="labels" value="Notice"> Notice</label>
+      {% for lbl in ALLOWED_LABELS %}
+      <label><input type="checkbox" name="labels" value="{{ lbl }}"> {{ lbl }}</label>
+      {% endfor %}
     </div>
+
     <button type="submit">Save</button>
   </form>
 </div>

@@ -9,9 +9,44 @@
     <p><strong>Author:</strong> {{ item.author }}</p>
     <p><strong>Time window:</strong> <small class="mono">{{ item.start_time }}</small> → <small class="mono">{{ item.end_time }}</small></p>
     <p style="white-space: pre-wrap">{{ item.description }}</p>
-    <p>{% for tag in (item.tags or '').split(',') if tag %}<span class="tag">{{ tag }}</span>{% endfor %}</p>
+    <p>
+      {% for tag in (item.tags or '').split(',') if tag %}
+        <span class="tag">{{ tag }}</span>
+      {% endfor %}
+    </p>
     <p><small class="mono">Created: {{ item.created_at }}</small></p>
-    <p><a href="/data">← Back to list</a></p>
+
+    {% if can_delete %}
+      <form method="post" action="/data/{{ item.id }}/delete" onsubmit="return confirm('Delete this report?');">
+        <button type="submit">Delete</button>
+      </form>
+      {% if user and user.is_admin %}
+        <p><a href="/data/{{ item.id }}/edit">Edit</a></p>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3>Comments</h3>
+  {% if comments|length == 0 %}
+    <p>No comments yet.</p>
+  {% else %}
+    <ul class="comments">
+      {% for c in comments %}
+        <li><strong>{{ c.author_name }}</strong> <small class="mono">{{ c.created_at }}</small><br>{{ c.content }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if user %}
+  <form method="post" action="/data/{{ item.id }}/comment">
+    <label>Add a comment</label>
+    <textarea name="content" rows="3" required></textarea>
+    <button type="submit">Post</button>
+  </form>
+  {% else %}
+    <p class="muted">Log in to comment.</p>
   {% endif %}
 </div>
 {% endblock %}

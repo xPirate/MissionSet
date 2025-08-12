@@ -4,22 +4,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <a href="/"><title>MissionSet Lite</title></a>
-  <link rel="stylesheet" href="/static/styles.css">
-  <script>(function(){try{if(localStorage.getItem('ms-theme')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();</script>
+
+  <title>MissionSet</title>
+ <link rel="stylesheet" href="/static/styles.css">
+  <script>(function(){try{if(localStorage.getItem('ms-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})();</script>
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <div class="brand">MissionSet</div>
-           </nav>
-      <div class="nav-label">General</div>
+
+      <a href="/"><div class="brand">MissionSet</div></a>
+
+       <div class="nav-label">General</div>
+
       <nav class="nav">
         <a href="/">Dashboard</a>
         <a href="/data">All Reports</a>
         <a href="/data/new">Add</a>
         <a href="/search">Search</a>
       </nav>
+
       <div class="nav-label">Modules</div>
       <nav class="nav">
         <a href="/module/Recon">Recon</a>
@@ -28,15 +32,33 @@
         <a href="/module/Emergency">Emergency</a>
         <a href="/module/Notice">Notice</a>
       </nav>
-      <button id="themeToggle" class="toggle">Lightswitch</button>
+     
+
+      <div class="nav-label">Account</div>
+      <nav class="nav">
+        {% if user %}
+          <span class="muted">Signed in as {{ profile.name or user.username }}</span>
+          <a href="/profile">Profile</a>
+          {% if user.is_admin %}<a href="/admin/users">Admin</a>{% endif %}
+          <form class="inline" method="post" action="/auth/logout"><button type="submit">Logout</button></form>
+        {% else %}
+          <a href="/auth/login">Login</a>
+          <a href="/auth/register">Register</a>
+        {% endif %}
+      </nav>
+
+      <button id="themeToggle" class="toggle">🌓 Toggle</button>
+
+
     </aside>
     <main class="container">
       {% block content %}{% endblock %}
     </main>
   </div>
+
   <script>
-    const btn=document.getElementById('themeToggle');
-    if(btn){btn.addEventListener('click',()=>{const root=document.documentElement;const isDark=root.classList.toggle('dark');try{localStorage.setItem('ms-theme',isDark?'dark':'light')}catch(e){}})}
+    const t=document.getElementById('themeToggle');
+    if(t){t.addEventListener('click',()=>{const r=document.documentElement;const d=r.classList.toggle('dark');try{localStorage.setItem('ms-theme',d?'dark':'light')}catch(e){}})}
   </script>
 </body>
 </html>
