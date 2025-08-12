@@ -1,6 +1,0 @@
-fastapi
-uvicorn[standard]
-Jinja2
-SQLAlchemy
-opensearch-py
-python-multipart>=0.0.9
