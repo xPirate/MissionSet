@@ -1,8 +1,7 @@
 
 import os
-import json
-from datetime import datetime, timedelta
-from typing import Optional, List, Dict
+from datetime import datetime
+from typing import Optional, List
 
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -29,7 +28,7 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} i
 def init_db():
     with engine.begin() as conn:
         conn.exec_driver_sql(
-            """
+            '''
             CREATE TABLE IF NOT EXISTS items (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
@@ -37,7 +36,7 @@ def init_db():
                 tags TEXT,
                 created_at TEXT NOT NULL
             );
-            """
+            '''
         )
 init_db()
 
@@ -49,130 +48,69 @@ os_client = OpenSearch(
 )
 
 def ensure_index():
-    try:
-        if not os_client.indices.exists(index=OS_INDEX):
-            os_client.indices.create(
-                index=OS_INDEX,
-                body={
-                    "settings": {"index": {"number_of_shards": 1, "number_of_replicas": 0}},
-                    "mappings": {
-                        "properties": {
-                            "title": {"type": "text"},
-                            "description": {"type": "text"},
-                            "tags": {"type": "keyword"},
-                            "created_at": {"type": "date"}
-                        }
+    if not os_client.indices.exists(index=OS_INDEX):
+        os_client.indices.create(
+            index=OS_INDEX,
+            body={
+                "settings": {"index": {"number_of_shards": 1, "number_of_replicas": 0}},
+                "mappings": {
+                    "properties": {
+                        "title": {"type": "text"},
+                        "description": {"type": "text"},
+                        "tags": {"type": "keyword"},
+                        "created_at": {"type": "date"}
                     }
                 }
-            )
-    except Exception as e:
-        print("OpenSearch index init error:", e)
+            },
+        )
 
-ensure_index()
-
-def row_to_dict(row):
-    return dict(row._mapping) if row else None
-
-def get_last_n_days(n: int):
-    from datetime import datetime, timedelta
-    today = datetime.utcnow().date()
-    return [(today - timedelta(days=i)).isoformat() for i in range(n-1, -1, -1)]
-
-def compute_dashboard_stats():
-    with engine.connect() as conn:
-        rows = conn.execute(text("SELECT id, title, description, tags, created_at FROM items ORDER BY id DESC LIMIT 5")).all()
-        recent = [row_to_dict(r) for r in rows]
-        all_rows = conn.execute(text("SELECT tags FROM items")).all()
-        days = get_last_n_days(5)
-        min_day, max_day = days[0], days[-1]
-        day_rows = conn.execute(
-            text("SELECT substr(created_at,1,10) AS day, COUNT(*) AS c FROM items WHERE day BETWEEN :min_d AND :max_d GROUP BY day ORDER BY day"),
-            {"min_d": min_day, "max_d": max_day}
-        ).all()
-
-    label_counts = {label: 0 for label in ALLOWED_LABELS}
-    unlabeled = 0
-    for r in all_rows:
-        tags = (r[0] or "").split(",")
-        tags = [t.strip() for t in tags if t.strip()]
-        if not tags:
-            unlabeled += 1
-        for t in tags:
-            if t in label_counts:
-                label_counts[t] += 1
-            else:
-                unlabeled += 1
-
-    day_map = {d: 0 for d in days}
-    for r in day_rows:
-        d = r._mapping["day"]
-        c = r._mapping["c"]
-        if d in day_map:
-            day_map[d] = c
-
-    pie_labels = list(label_counts.keys()) + (["Unlabeled"] if unlabeled else [])
-    pie_values = list(label_counts.values()) + ([unlabeled] if unlabeled else [])
-
-    return {
-        "recent": recent,
-        "pie_labels_json": json.dumps(pie_labels),
-        "pie_values_json": json.dumps(pie_values),
-        "line_labels_json": json.dumps(days),
-        "line_values_json": json.dumps([day_map[d] for d in days]),
-    }
+try:
+    ensure_index()
+except Exception as e:
+    print("OpenSearch index init error:", e)
 
 @app.get("/", response_class=HTMLResponse)
-def dashboard(request: Request):
-    stats = compute_dashboard_stats()
-    ctx = {"request": request}
-    ctx.update(stats)
-    return templates.TemplateResponse("index.html", ctx)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "OS_INDEX": OS_INDEX})
 
 @app.get("/data", response_class=HTMLResponse)
 def list_items(request: Request):
     with engine.connect() as conn:
         rows = conn.execute(text("SELECT id, title, description, tags, created_at FROM items ORDER BY id DESC")).all()
-    items = [row_to_dict(r) for r in rows]
-    return templates.TemplateResponse("data.html", {"request": request, "items": items})
+    return templates.TemplateResponse("data.html", {"request": request, "items": rows})
 
 @app.get("/data/new", response_class=HTMLResponse)
 def new_item_form(request: Request):
-    return templates.TemplateResponse("new.html", {"request": request, "labels": ALLOWED_LABELS})
+    return templates.TemplateResponse("new.html", {"request": request})
 
 @app.post("/data/new")
-def create_item(title: str = Form(...), description: str = Form(""), labels: List[str] = Form([])):
+def create_item(
+    title: str = Form(...),
+    description: str = Form(""),
+    labels: List[str] = Form([]),
+):
     labels = [l for l in labels if l in ALLOWED_LABELS]
     labels_str = ",".join(labels)
     created_at = datetime.utcnow().isoformat()
 
     with engine.begin() as conn:
-        try:
-            item_id = conn.execute(
-                text("""
-                    INSERT INTO items (title, description, tags, created_at)
-                    VALUES (:t, :d, :g, :c)
-                    RETURNING id
-                    """),
-                {"t": title, "d": description, "g": labels_str, "c": created_at},
-            ).scalar_one()
-        except Exception:
-            conn.execute(
-                text("INSERT INTO items (title, description, tags, created_at) VALUES (:t, :d, :g, :c)"),
-                {"t": title, "d": description, "g": labels_str, "c": created_at},
-            )
-            item_id = conn.execute(text("SELECT last_insert_rowid()")).scalar_one()
-
-        row = conn.execute(text("SELECT id, title, description, tags, created_at FROM items WHERE id = :id"), {"id": item_id}).first()
-
-    item = row_to_dict(row)
+        conn.execute(
+            text("INSERT INTO items (title, description, tags, created_at) VALUES (:t, :d, :g, :c)"),
+            {"t": title, "d": description, "g": labels_str, "c": created_at}
+        )
+        row = conn.execute(
+            text("SELECT id, title, description, tags, created_at FROM items WHERE id = last_insert_rowid()")
+        ).one()
+        item_id = row.id
+        doc = {
+            "title": row.title,
+            "description": row.description,
+            "tags": [t.strip() for t in (row.tags or '').split(',') if t.strip()],
+            "created_at": row.created_at
+        }
 
     try:
-        os_client.index(index=OS_INDEX, id=str(item_id), body={
-            "title": item["title"],
-            "description": item["description"],
-            "tags": [t.strip() for t in (item.get("tags") or "").split(",") if t.strip()],
-            "created_at": item["created_at"],
-        }, refresh=True)
+        os_client.index(index=OS_INDEX, id=item_id, body=doc, refresh=True)
     except Exception as e:
         print("OpenSearch index error:", e)
 
@@ -181,9 +119,11 @@ def create_item(title: str = Form(...), description: str = Form(""), labels: Lis
 @app.get("/data/{item_id}", response_class=HTMLResponse)
 def view_item(request: Request, item_id: int):
     with engine.connect() as conn:
-        row = conn.execute(text("SELECT id, title, description, tags, created_at FROM items WHERE id = :id"), {"id": item_id}).first()
-    item = row_to_dict(row)
-    return templates.TemplateResponse("item.html", {"request": request, "item": item})
+        row = conn.execute(
+            text("SELECT id, title, description, tags, created_at FROM items WHERE id = :id"),
+            {"id": item_id}
+        ).first()
+    return templates.TemplateResponse("item.html", {"request": request, "item": row})
 
 @app.get("/search", response_class=HTMLResponse)
 def search(request: Request, q: Optional[str] = None):
@@ -191,11 +131,24 @@ def search(request: Request, q: Optional[str] = None):
     error = None
     if q:
         try:
-            body = {"query": {"multi_match": {"query": q, "fields": ["title^2", "description", "tags"]}}}
+            body = {
+                "query": {
+                    "multi_match": {
+                        "query": q,
+                        "fields": ["title^2", "description", "tags"]
+                    }
+                }
+            }
             resp = os_client.search(index=OS_INDEX, body=body)
-            for hit in resp.get("hits", {}).get("hits", []):
-                src = hit.get("_source", {})
-                results.append({"id": hit.get("_id"), "title": src.get("title"), "description": src.get("description"), "tags": ", ".join(src.get("tags", []) or []), "created_at": src.get("created_at")})
+            for hit in resp["hits"]["hits"]:
+                src = hit["_source"]
+                results.append({
+                    "id": hit.get("_id"),
+                    "title": src.get("title"),
+                    "description": src.get("description"),
+                    "tags": ", ".join(src.get("tags", [])),
+                    "created_at": src.get("created_at")
+                })
         except Exception as e:
             error = str(e)
     return templates.TemplateResponse("search.html", {"request": request, "q": q or "", "results": results, "error": error})

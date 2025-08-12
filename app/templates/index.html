@@ -1,45 +1,16 @@
 
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Dashboard</h1>
-<div class="grid2">
+<div class="grid">
   <div class="card">
-    <h3>Report Distribution</h3>
-    <canvas id="pie"></canvas>
-  </div>
-  <div class="card">
-    <h3>Recent Reports</h3>
-    <ul class="recent">
-      {% for it in recent %}
-        <li><a href="/data/{{ it.id }}">{{ it.title }}</a> <small class="mono">{{ it.created_at }}</small></li>
-      {% endfor %}
-      {% if not recent %}<li>No reports yet.</li>{% endif %}
+    <h2>Welcome</h2>
+    <p>This is a minimal platform to add items to a database and search them with OpenSearch.</p>
+    <ul>
+      <li><a href="/data/new">Add a new item</a></li>
+      <li><a href="/data">View items</a></li>
+      <li><a href="/search">Search</a></li>
     </ul>
+    <p><small class="mono">OpenSearch index: {{ OS_INDEX if OS_INDEX else 'missionset-data' }}</small></p>
   </div>
 </div>
-
-<div class="card" style="margin-top:16px;">
-  <h3>Reports per day (last 5 days)</h3>
-  <canvas id="line"></canvas>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const pieLabels = {{ pie_labels_json | safe }};
-  const pieValues = {{ pie_values_json | safe }};
-  const lineLabels = {{ line_labels_json | safe }};
-  const lineValues = {{ line_values_json | safe }};
-
-  new Chart(document.getElementById('pie'), {
-    type: 'pie',
-    data: { labels: pieLabels, datasets: [{ data: pieValues }] },
-    options: { plugins: { legend: { position: 'bottom' } } }
-  });
-
-  new Chart(document.getElementById('line'), {
-    type: 'line',
-    data: { labels: lineLabels, datasets: [{ data: lineValues, fill: false, tension: 0.2 }] },
-    options: { scales: { y: { beginAtZero: true, precision: 0 } }, plugins: { legend: { display: false } } }
-  });
-</script>
 {% endblock %}

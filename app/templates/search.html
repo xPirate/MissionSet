@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Search</h2>
+  <form method="get" action="/search">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search title, description, labels">
+    <button type="submit">Search</button>
+  </form>
+  <br>
+  {% if error %}
+    <p style="color:#c00;">Error: {{ error }}</p>
+  {% endif %}
+  {% if q and results|length == 0 and not error %}
+    <p>No results for <strong>{{ q }}</strong>.</p>
+  {% endif %}
+  {% if results|length > 0 %}
+  <table>
+    <thead><tr><th>Title</th><th>Labels</th><th>Created</th></tr></thead>
+    <tbody>
+      {% for r in results %}
+      <tr>
+        <td><a href="/data/{{ r.id }}">{{ r.title }}</a></td>
+        <td>{{ r.tags }}</td>
+        <td><small class="mono">{{ r.created_at }}</small></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}
