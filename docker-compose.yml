@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.13.0
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - osdata:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  app:
+    build: ./app
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    environment:
+      - OS_HOST=opensearch
+      - OS_PORT=9200
+      - OS_INDEX=missionset-data
+      - DATABASE_URL=sqlite:////data/data.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - appdata:/data
+
+volumes:
+  osdata:
+  appdata:
