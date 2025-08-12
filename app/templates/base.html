@@ -4,23 +4,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>MissionSet</title>
-  <link rel="stylesheet" href="/static/styles.css">
+ <link rel="stylesheet" href="/static/styles.css">
   <script>(function(){try{if(localStorage.getItem('ms-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})();</script>
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
+
       <a href="/"><div class="brand">MissionSet</div></a>
 
        <div class="nav-label">General</div>
+
       <nav class="nav">
         <a href="/">Dashboard</a>
         <a href="/data">All Reports</a>
         <a href="/data/new">Add</a>
         <a href="/search">Search</a>
       </nav>
-      
+
       <div class="nav-label">Modules</div>
       <nav class="nav">
         <a href="/module/Recon">Recon</a>
@@ -29,7 +32,6 @@
         <a href="/module/Emergency">Emergency</a>
         <a href="/module/Notice">Notice</a>
       </nav>
-
      
 
       <div class="nav-label">Account</div>
@@ -46,6 +48,8 @@
       </nav>
 
       <button id="themeToggle" class="toggle">🌓 Toggle</button>
+
+
     </aside>
     <main class="container">
       {% block content %}{% endblock %}
