@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Add Item</h2>
+  <form method="post" action="/data/new">
+    <label>Title</label>
+    <input type="text" name="title" required>
+    <br><br>
+    <label>Description</label>
+    <textarea name="description" rows="5"></textarea>
+    <br><br>
+    <label>Tags (comma-separated)</label>
+    <input type="text" name="tags" placeholder="alpha, bravo">
+    <br><br>
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}
