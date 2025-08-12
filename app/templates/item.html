@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  {% if not item %}
+    <p>Item not found.</p>
+  {% else %}
+    <h2>{{ item.title }}</h2>
+    <p><strong>Author:</strong> {{ item.author }}</p>
+    <p><strong>Time window:</strong> <small class="mono">{{ item.start_time }}</small> → <small class="mono">{{ item.end_time }}</small></p>
+    <p style="white-space: pre-wrap">{{ item.description }}</p>
+    <p>{% for tag in (item.tags or '').split(',') if tag %}<span class="tag">{{ tag }}</span>{% endfor %}</p>
+    <p><small class="mono">Created: {{ item.created_at }}</small></p>
+    <p><a href="/data">← Back to list</a></p>
+  {% endif %}
+</div>
+{% endblock %}
