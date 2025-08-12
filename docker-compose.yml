@@ -6,7 +6,7 @@ services:
     environment:
       - discovery.type=single-node
       - plugins.security.disabled=true
-      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx2048m
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
     ulimits:
       memlock:
