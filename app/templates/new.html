@@ -1,0 +1,38 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Add Item</h2>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <form method="post" action="/data/new">
+    <label>Title</label>
+    <input type="text" name="title" required>
+
+    <label>Author</label>
+    <input type="text" value="{{ current_user_name }}" readonly>
+
+    <div class="row">
+      <div>
+        <label>Start time</label>
+        <input type="datetime-local" name="start_time" required>
+      </div>
+      <div>
+        <label>End time</label>
+        <input type="datetime-local" name="end_time" required>
+      </div>
+    </div>
+
+    <label>Description</label>
+    <textarea name="description" rows="5"></textarea>
+
+    <label>Labels</label>
+    <div class="labels">
+      {% for lbl in ALLOWED_LABELS %}
+      <label><input type="checkbox" name="labels" value="{{ lbl }}"> {{ lbl }}</label>
+      {% endfor %}
+    </div>
+
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

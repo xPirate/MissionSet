@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>All Reports</h2>
+  <p><a href="/data/new">+ Add Item</a></p>
+  {% if items|length == 0 %}
+    <p>No items yet.</p>
+  {% else %}
+  <table>
+    <thead><tr><th>Title</th><th>Author</th><th>Labels</th><th>Start</th><th>End</th><th>Created</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for row in items %}
+      <tr>
+        <td><a href="/data/{{ row.id }}">{{ row.title }}</a></td>
+        <td>{{ row.author }}</td>
+        <td>
+          {% for tag in (row.tags or '').split(',') if tag %}
+            <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </td>
+        <td><small class="mono">{{ row.start_time }}</small></td>
+        <td><small class="mono">{{ row.end_time }}</small></td>
+        <td><small class="mono">{{ row.created_at }}</small></td>
+        <td class="actions">
+          {% if user %}
+            {% if user.is_admin %}
+              <a href="/data/{{ row.id }}/edit">Edit</a>
+              <form method="post" action="/data/{{ row.id }}/delete" onsubmit="return confirm('Delete report?');"><button type="submit">Delete</button></form>
+            {% elif user.id == row.author_user_id %}
+              <form method="post" action="/data/{{ row.id }}/delete" onsubmit="return confirm('Delete your report?');"><button type="submit">Delete</button></form>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}
