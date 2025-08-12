@@ -5,3 +5,4 @@ SQLAlchemy
 opensearch-py
 python-multipart
 passlib[bcrypt]
+itsdangerous>=2.1
