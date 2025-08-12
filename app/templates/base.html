@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MissionSet Lite</title>
+  <a href="/"><title>MissionSet Lite</title></a>
   <link rel="stylesheet" href="/static/styles.css">
   <script>(function(){try{if(localStorage.getItem('ms-theme')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();</script>
 </head>
@@ -12,6 +12,14 @@
   <div class="layout">
     <aside class="sidebar">
       <div class="brand">MissionSet</div>
+           </nav>
+      <div class="nav-label">General</div>
+      <nav class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/data">All Reports</a>
+        <a href="/data/new">Add</a>
+        <a href="/search">Search</a>
+      </nav>
       <div class="nav-label">Modules</div>
       <nav class="nav">
         <a href="/module/Recon">Recon</a>
@@ -19,13 +27,6 @@
         <a href="/module/Medical">Medical</a>
         <a href="/module/Emergency">Emergency</a>
         <a href="/module/Notice">Notice</a>
-      </nav>
-      <div class="nav-label">General</div>
-      <nav class="nav">
-        <a href="/">Dashboard</a>
-        <a href="/data">All Reports</a>
-        <a href="/data/new">Add</a>
-        <a href="/search">Search</a>
       </nav>
       <button id="themeToggle" class="toggle">🌓 Toggle</button>
     </aside>
