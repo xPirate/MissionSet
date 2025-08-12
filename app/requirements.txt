@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+Jinja2
+SQLAlchemy
+opensearch-py
