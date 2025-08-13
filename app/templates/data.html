@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
@@ -14,11 +13,7 @@
       <tr>
         <td><a href="/data/{{ row.id }}">{{ row.title }}</a></td>
         <td>{{ row.author }}</td>
-        <td>
-          {% for tag in (row.tags or '').split(',') if tag %}
-            <span class="tag">{{ tag }}</span>
-          {% endfor %}
-        </td>
+        <td>{% for tag in (row.tags or '').split(',') if tag %}<span class="tag">{{ tag }}</span>{% endfor %}</td>
         <td><small class="mono">{{ row.start_time }}</small></td>
         <td><small class="mono">{{ row.end_time }}</small></td>
         <td><small class="mono">{{ row.created_at }}</small></td>

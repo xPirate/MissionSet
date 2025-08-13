@@ -1,15 +1,31 @@
-
 {% extends "base.html" %}
 {% block content %}
-<div class="card">
-  <h2>New User</h2>
-  {% if error %}<p class="error">{{ error }}</p>{% endif %}
-  <form method="post" action="/admin/users/new">
-    <label>Username</label><input type="text" name="username" required>
-    <label>Password</label><input type="password" name="password" required>
-    <label>Full name</label><input type="text" name="name" required>
-    <label><input type="checkbox" name="is_admin" value="1"> Admin</label>
-    <button type="submit">Create</button>
-  </form>
-</div>
+<h1>New User</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post" action="/admin/users/new" class="card">
+  <label>Username</label>
+  <input type="text" name="username" required>
+  <label>Password</label>
+  <input type="password" name="password" required>
+  <label>Full Name</label>
+  <input type="text" name="name" required>
+  <div class="row">
+    <div>
+      <label>Team</label>
+      <select name="team">
+        <option value="">—</option>
+        {% for t in TEAMS if t != 'ADMIN' %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Role</label>
+      <select name="team_role">
+        <option value="">—</option>
+        {% for r in ROLES if r != 'ADMIN' %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+  <label style="margin-top:8px"><input type="checkbox" name="is_admin" value="1"> Make Admin (auto-assigns ADMIN team/role)</label>
+  <div style="margin-top:12px"><button type="submit">Create</button></div>
+</form>
 {% endblock %}

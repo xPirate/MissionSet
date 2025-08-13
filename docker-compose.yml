@@ -33,6 +33,12 @@ services:
       - OS_PORT=9200
       - OS_INDEX=missionset-data
       - DATABASE_URL=sqlite:////data/data.db
+      - BRAND_NAME=${BRAND_NAME}
+      - BRAND_TAGLINE=${BRAND_TAGLINE}
+      - BRAND_LOGO_URL=${BRAND_LOGO_URL}
+      - BRAND_PRIMARY=${BRAND_PRIMARY}
+      - BRAND_FOOTER_LINK_TEXT=${BRAND_FOOTER_LINK_TEXT}
+      - BRAND_FOOTER_LINK_URL=${BRAND_FOOTER_LINK_URL}
     ports:
       - "8000:8000"
     volumes:

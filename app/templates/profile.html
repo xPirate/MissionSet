@@ -1,27 +1,88 @@
-
 {% extends "base.html" %}
 {% block content %}
+<h1 class="page-title">Profile</h1>
 <div class="card">
-  <h2>Profile</h2>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
   <form method="post" action="/profile">
-    <label>Name</label><input type="text" name="name" value="{{ prof.name }}" required>
+    <label>Full Name</label>
+    <input type="text" name="name" value="{{ prof.name or '' }}" required>
+
     <div class="row">
-      <div><label>Birthday</label><input type="date" name="birthday" value="{{ prof.birthday }}"></div>
-      <div><label>Blood type</label><input type="text" name="blood_type" value="{{ prof.blood_type }}" placeholder="O+, A-, etc."></div>
+      <div>
+        <label>Birthday</label>
+        <input type="date" name="birthday" value="{{ prof.birthday or '' }}" required>
+      </div>
+      <div>
+        <label>Blood Type</label>
+        {% set BT = BLOOD_TYPES if BLOOD_TYPES else ["","A+","A-","B+","B-","AB+","AB-","O+","O-"] %}
+        <select name="blood_type">
+          {% for bt in BT %}
+            <option value="{{ bt }}" {% if (prof.blood_type or '') == bt %}selected{% endif %}>{{ bt if bt else '—' }}</option>
+          {% endfor %}
+        </select>
+        <div class="hint">Leave blank if you prefer not to share.</div>
+      </div>
     </div>
+
     <div class="row">
-      <div><label>Team</label><input type="text" name="team" value="{{ prof.team }}"></div>
-      <div><label>Role</label><input type="text" name="team_role" value="{{ prof.team_role }}" placeholder="medic, comms, ..."></div>
+      <div>
+        <label>Team</label>
+        {% if user and user.is_admin %}
+          <input type="text" value="ADMIN" disabled>
+          <input type="hidden" name="team" value="ADMIN">
+        {% else %}
+          <select name="team" required>
+            <option value="">—</option>
+            {% for t in TEAMS if t != 'ADMIN' %}
+              <option value="{{ t }}" {% if (prof.team or '') == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
+      </div>
+      <div>
+        <label>Team Role</label>
+        {% if user and user.is_admin %}
+          <input type="text" value="ADMIN" disabled>
+          <input type="hidden" name="team_role" value="ADMIN">
+        {% else %}
+          <select name="team_role" required>
+            <option value="">—</option>
+            {% for r in ROLES if r != 'ADMIN' %}
+              <option value="{{ r }}" {% if (prof.team_role or '') == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
+      </div>
     </div>
+
     <div class="row">
-      <div><label>Phone</label><input type="text" name="phone" value="{{ prof.phone }}"></div>
-      <div><label>Email</label><input type="email" name="email" value="{{ prof.email }}"></div>
+      <div>
+        <label>Email</label>
+        <input type="email" name="email" value="{{ prof.email or '' }}" required>
+      </div>
+      <div>
+        <label>Phone</label>
+        <input type="tel" name="phone" value="{{ prof.phone or '' }}" required>
+      </div>
     </div>
+
+    <h3 style="margin-top:16px">Emergency Contact</h3>
     <div class="row">
-      <div><label>Emergency Contact</label><input type="text" name="contact_name" value="{{ prof.contact_name }}"></div>
-      <div><label>Contact Phone</label><input type="text" name="contact_phone" value="{{ prof.contact_phone }}"></div>
+      <div>
+        <label>Contact Name</label>
+        <input type="text" name="contact_name" value="{{ prof.contact_name or '' }}" required>
+      </div>
+      <div>
+        <label>Contact Phone</label>
+        <input type="tel" name="contact_phone" value="{{ prof.contact_phone or '' }}" required>
+      </div>
     </div>
-    <button type="submit">Save</button>
+
+    <button type="submit">Save Profile</button>
   </form>
 </div>
+<style>
+  .row{display:flex;gap:12px}.row>div{flex:1}.hint{color:#94a3b8;font-size:12px;margin-top:4px}
+  .card input,.card select{width:100%}
+</style>
 {% endblock %}

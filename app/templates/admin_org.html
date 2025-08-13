@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Organization</h1>
+<div class="grid-2">
+  <div class="card">
+    <h2>Teams</h2>
+    <ul class="list">
+      {% for t in teams %}
+        <li><a href="/admin/org/team/{{ t }}">{{ t }}</a></li>
+      {% endfor %}
+    </ul>
+    <h3>Add Team</h3>
+    <form method="post" action="/admin/org/team/new">
+      <label>Name</label><input type="text" name="name" required>
+      <label>Description</label><input type="text" name="description">
+      <div style="margin-top:10px"><button type="submit">Add Team</button></div>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Roles</h2>
+    <ul class="list">
+      {% for r in roles %}<li>{{ r }}</li>{% endfor %}
+    </ul>
+    <h3>Add Role</h3>
+    <form method="post" action="/admin/org/role/new">
+      <label>Name</label><input type="text" name="name" required>
+      <label>Description</label><input type="text" name="description">
+      <div style="margin-top:10px"><button type="submit">Add Role</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

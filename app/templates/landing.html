@@ -1,0 +1,94 @@
+{% extends "base_public.html" %}
+{% block content %}
+<style>
+  .landing-wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;min-height:70vh}
+  .hero{padding:24px;border:1px dashed var(--border);border-radius:16px;background:linear-gradient(135deg,rgba(99,102,241,.10),rgba(14,165,233,.10))}
+  .hero h1{margin:0 0 12px 0;font-size:32px}
+  .hero p{margin:0;color:var(--muted)}
+  .auth-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tabs button{padding:8px 12px;border:1px solid var(--border);background:transparent;border-radius:8px;cursor:pointer}
+  .tabs button.active{outline:2px solid var(--border)}
+  .mutey{color:var(--muted);font-size:12px}
+</style>
+
+<div class="landing-wrap">
+  <div class="hero">
+    {% if BRAND.logo_url %}
+      <img src="{{ BRAND.logo_url }}" alt="{{ BRAND.name }}" style="height:44px;width:auto;margin-bottom:8px;">
+    {% endif %}
+    <div class="brand" style="font-size:20px;margin-bottom:8px;">{{ BRAND.name }}</div>
+    <h1>{{ BRAND.tagline }}</h1>
+    <p>Sign in to manage reports, collaborate with your team, and search across labels. Least-privilege by default with per-label permissions.</p>
+    <p class="mutey" style="margin-top:12px;">Tip: first user created becomes admin.</p>
+  </div>
+
+  <div class="auth-card">
+    <div class="tabs">
+      <button id="tab-login" class="{{ 'active' if active_tab=='login' else '' }}">Login</button>
+      {% if allow_register %}
+        <button id="tab-register" class="{{ 'active' if active_tab=='register' else '' }}">Register</button>
+      {% endif %}
+    </div>
+
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+    <!-- Login -->
+    <form id="form-login" method="post" action="/auth/login" style="{{ '' if active_tab=='login' else 'display:none' }}">
+      <input type="hidden" name="next" value="{{ next_url or '/' }}">
+      <label>Username</label><input type="text" name="username" required>
+      <label>Password</label><input type="password" name="password" required>
+      <button type="submit">Sign in</button>
+      {% if not allow_register %}
+        <p class="mutey" style="margin-top:8px;">Registration is disabled. Ask an admin to create your account.</p>
+      {% endif %}
+    </form>
+
+    {% if allow_register %}
+<!-- Register -->
+<form id="form-register" method="post" action="/auth/register" style="{{ '' if active_tab=='register' else 'display:none' }}">
+  <label>Username</label><input type="text" name="username" required>
+
+  <div class="row">
+    <div>
+      <label>First name</label>
+      <input type="text" name="first_name" required>
+    </div>
+    <div>
+      <label>Last name</label>
+      <input type="text" name="last_name" required>
+    </div>
+  </div>
+
+  <label>Password</label><input type="password" name="password" required>
+  <button type="submit">Create first admin</button>
+  <p class="mutey" style="margin-top:8px;">First account becomes admin automatically.</p>
+</form>
+{% endif %}
+  </div>
+</div>
+
+<script>
+  const loginTab = document.getElementById('tab-login');
+  const regTab = document.getElementById('tab-register');
+  const loginForm = document.getElementById('form-login');
+  const regForm = document.getElementById('form-register');
+
+  if (loginTab) {
+    loginTab.addEventListener('click', () => {
+      loginTab.classList.add('active');
+      if (regTab) regTab.classList.remove('active');
+      if (loginForm) loginForm.style.display='';
+      if (regForm) regForm.style.display='none';
+    });
+  }
+  if (regTab) {
+    regTab.addEventListener('click', () => {
+      regTab.classList.add('active');
+      loginTab.classList.remove('active');
+      if (loginForm) loginForm.style.display='none';
+      if (regForm) regForm.style.display='';
+    });
+  }
+</script>
+{% endblock %}

@@ -1,26 +1,26 @@
-
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Manage Users</h1>
+<h1>Users</h1>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+  <div></div>
+  <a class="btn" href="/admin/users/new">+ New User</a>
+</div>
 <div class="card">
-  <p><a href="/admin/users/new">+ New user</a></p>
-  <table>
-    <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Admin</th><th>Active</th><th>Actions</th></tr></thead>
-    <tbody>
-      {% for u in users %}
-      <tr>
-        <td>{{ u.id }}</td>
-        <td>{{ u.username }}</td>
-        <td>{{ u.name }}</td>
-        <td>{{ 'Yes' if u.is_admin else 'No' }}</td>
-        <td>{{ 'Yes' if u.is_active else 'No' }}</td>
-        <td class="actions">
-          <form method="post" action="/admin/users/{{ u.id }}/toggle_admin"><button type="submit">{{ 'Revoke admin' if u.is_admin else 'Make admin' }}</button></form>
-          <form method="post" action="/admin/users/{{ u.id }}/toggle_active"><button type="submit">{{ 'Deactivate' if u.is_active else 'Activate' }}</button></form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<table class="table">
+  <thead><tr><th>Username</th><th>First</th><th>Last</th><th>Team</th><th>Role</th><th>Admin</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td><a href="/admin/user/{{ u.id }}">{{ u.username }}</a></td>
+      <td>{{ u.first_name }}</td>
+      <td>{{ u.last_name }}</td>
+      <td>{{ u.team }}</td>
+      <td>{{ u.team_role }}</td>
+      <td>{{ 'Yes' if u.is_admin else 'No' }}</td>
+      <td>{{ 'Active' if u.is_active else 'Disabled' }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
 </div>
 {% endblock %}

@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
@@ -27,12 +26,17 @@
 
     <label>Labels</label>
     <div class="labels">
-      {% for lbl in ALLOWED_LABELS %}
-      <label><input type="checkbox" name="labels" value="{{ lbl }}"> {{ lbl }}</label>
-      {% endfor %}
+      {% set creatables = CREATE_LABELS or ALLOWED_LABELS %}
+      {% if creatables|length == 0 %}
+        <p class="muted">You do not have create permission for any labels. Contact an admin.</p>
+      {% else %}
+        {% for lbl in creatables %}
+          <label><input type="checkbox" name="labels" value="{{ lbl }}"> {{ lbl }}</label>
+        {% endfor %}
+      {% endif %}
     </div>
 
-    <button type="submit">Save</button>
+    <button type="submit" {% if creatables|length == 0 %}disabled{% endif %}>Save</button>
   </form>
 </div>
 {% endblock %}

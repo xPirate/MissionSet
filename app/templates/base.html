@@ -1,64 +1,65 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>MissionSet</title>
- <link rel="stylesheet" href="/static/styles.css">
-  <script>(function(){try{if(localStorage.getItem('ms-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})();</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ BRAND.name }}</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <style>
+    :root { --primary: {{ BRAND.primary }}; }
+    body.layout { display:flex; min-height:100vh; background:#0b0f14; color:#e5e7eb; }
+    .sidebar { width:250px; background:#0f1720; border-right:1px solid #1f2937; padding:16px; position:sticky; top:0; height:100vh; }
+    .brand { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+    .brand img { width:28px; height:28px; }
+    .brand-name { font-weight:700; }
+    .sidebar nav a { display:block; padding:8px 10px; margin:2px 0; text-decoration:none; color:#e5e7eb; border-radius:8px; }
+    .sidebar nav a:hover,.sidebar nav a.active { background:rgba(99,102,241,.15); color:#fff; }
+    .sidebar nav .section { margin-top:10px; padding:6px 10px; font-size:12px; color:#94a3b8; text-transform:uppercase; }
+    .logout { margin-top:auto; }
+    .content { flex:1; padding:20px; }
+    .footer { margin-top:24px; font-size:12px; color:#94a3b8; }
+    .btn { display:inline-block; padding:8px 12px; background:var(--primary); color:#fff; border-radius:8px; text-decoration:none; }
+    .card { background:#0f1720; border:1px solid #1f2937; border-radius:10px; padding:16px; margin:12px 0; }
+    .table { width:100%; border-collapse:collapse; }
+    .table th,.table td { padding:8px 10px; border-bottom:1px solid #1f2937; text-align:left; }
+    .error { color:#ef4444; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .row { display:flex; gap:12px; }
+    .row>div { flex:1; }
+    input, select, textarea { width:100%; background:#0b1118; color:#e5e7eb; border:1px solid #1f2937; border-radius:8px; padding:8px; }
+    label { display:block; margin-top:8px; margin-bottom:4px; color:#cbd5e1; }
+    button { background:var(--primary); color:#fff; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
+  </style>
 </head>
-<body>
-  <div class="layout">
-    <aside class="sidebar">
-
-      <a href="/"><div class="brand">MissionSet</div></a>
-
-       <div class="nav-label">General</div>
-
-      <nav class="nav">
-        <a href="/">Dashboard</a>
-        <a href="/data">All Reports</a>
-        <a href="/data/new">Add</a>
-        <a href="/search">Search</a>
-      </nav>
-
-      <div class="nav-label">Modules</div>
-      <nav class="nav">
-        <a href="/module/Recon">Recon</a>
-        <a href="/module/Mission">Mission</a>
-        <a href="/module/Medical">Medical</a>
-        <a href="/module/Emergency">Emergency</a>
-        <a href="/module/Notice">Notice</a>
-      </nav>
-     
-
-      <div class="nav-label">Account</div>
-      <nav class="nav">
-        {% if user %}
-          <span class="muted">Signed in as {{ profile.name or user.username }}</span>
-          <a href="/profile">Profile</a>
-          {% if user.is_admin %}<a href="/admin/users">Admin</a>{% endif %}
-          <form class="inline" method="post" action="/auth/logout"><button type="submit">Logout</button></form>
-        {% else %}
-          <a href="/auth/login">Login</a>
-          <a href="/auth/register">Register</a>
-        {% endif %}
-      </nav>
-
-      <button id="themeToggle" class="toggle">🌓 Toggle</button>
-
-
-    </aside>
-    <main class="container">
-      {% block content %}{% endblock %}
-    </main>
-  </div>
-
-  <script>
-    const t=document.getElementById('themeToggle');
-    if(t){t.addEventListener('click',()=>{const r=document.documentElement;const d=r.classList.toggle('dark');try{localStorage.setItem('ms-theme',d?'dark':'light')}catch(e){}})}
-  </script>
+<body class="layout">
+  {% set hide_sidebar = not user %}
+  {% if not hide_sidebar %}
+  <aside class="sidebar">
+    <div class="brand">
+      {% if BRAND.logo_url %}<img src="{{ BRAND.logo_url }}" alt="logo"/>{% endif %}
+      <div class="brand-name">{{ BRAND.name }}</div>
+    </div>
+    <nav>
+      <a href="/">Dashboard</a>
+      <a href="/data">All Reports</a>
+      <div class="section">Modules</div>
+      {% for l in ALLOWED_LABELS %}
+        <a href="/module/{{ l|lower }}">{{ l }}</a>
+      {% endfor %}
+      <a href="/search">Search</a>
+      {% if user and user.is_admin %}
+        <div class="section">Admin</div>
+        <a href="/admin/users" {% if ADMIN_TAB=='users' %}class="active"{% endif %}>Users</a>
+        <a href="/admin/org" {% if ADMIN_TAB=='org' %}class="active"{% endif %}>Organization</a>
+        <a href="/admin/branding" {% if ADMIN_TAB=='branding' %}class="active"{% endif %}>Branding</a>
+      {% endif %}
+    </nav>
+    <form method="post" action="/auth/logout" class="logout"><button>Logout</button></form>
+  </aside>
+  {% endif %}
+  <main class="content">
+    {% block content %}{% endblock %}
+    <footer class="footer"><a href="{{ BRAND.footer_url }}" target="_blank" rel="noopener">{{ BRAND.footer_text }}</a></footer>
+  </main>
 </body>
 </html>

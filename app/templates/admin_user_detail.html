@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>User: {{ user.username }}</h1>
+<div class="card">
+  <p><strong>Name:</strong> {{ profile.name or '—' }}</p>
+  <p><strong>Admin:</strong> {{ 'Yes' if user.is_admin else 'No' }}</p>
+  <p><strong>Status:</strong> {{ 'Active' if user.is_active else 'Disabled' }}</p>
+</div>
+<h2>Organization</h2>
+<form method="post" action="/admin/user/{{ user.id }}/set_org" class="card">
+  <div class="row">
+    <div>
+      <label>Team</label>
+      <select name="team" {% if user.is_admin %}disabled{% endif %}>
+        {% if user.is_admin %}
+          <option value="ADMIN" selected>ADMIN</option>
+        {% else %}
+          <option value="">—</option>
+          {% for t in TEAMS if t != 'ADMIN' %}
+            <option value="{{ t }}" {% if profile.team == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+    </div>
+    <div>
+      <label>Role</label>
+      <select name="team_role" {% if user.is_admin %}disabled{% endif %}>
+        {% if user.is_admin %}
+          <option value="ADMIN" selected>ADMIN</option>
+        {% else %}
+          <option value="">—</option>
+          {% for r in ROLES if r != 'ADMIN' %}
+            <option value="{{ r }}" {% if profile.team_role == r %}selected{% endif %}>{{ r }}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+    </div>
+  </div>
+  <div style="margin-top:12px"><button type="submit" {% if user.is_admin %}disabled{% endif %}>Save</button></div>
+</form>
+{% endblock %}

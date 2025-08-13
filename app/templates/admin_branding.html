@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .admin-tabs{display:flex;gap:8px;margin-bottom:12px}
+  .admin-tabs a{padding:8px 12px;border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text)}
+  .admin-tabs a.active{outline:2px solid var(--border)}
+  .row{display:flex;gap:12px}
+  .row>div{flex:1}
+  .hint{color:var(--muted);font-size:12px}
+</style>
+
+<div class="admin-tabs">
+  <a href="/admin/users">Users</a>
+  <a href="/admin/branding" class="active">Branding</a>
+</div>
+
+<h1 class="page-title">Branding</h1>
+
+<div class="card">
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <form method="post" action="/admin/branding" enctype="multipart/form-data">
+    <div class="row">
+      <div>
+        <label>Product name</label>
+        <input type="text" name="name" value="{{ BRAND.name }}" required>
+      </div>
+      <div>
+        <label>Primary color</label>
+        <input type="text" name="primary" value="{{ BRAND.primary }}" placeholder="#3B82F6" required>
+        <div class="hint">Hex color, e.g. #6366F1</div>
+      </div>
+    </div>
+
+    <label>Tagline</label>
+    <input type="text" name="tagline" value="{{ BRAND.tagline }}" required>
+
+    <div class="row">
+      <div>
+        <label>Footer link text</label>
+        <input type="text" name="footer_text" value="{{ BRAND.footer_text }}" required>
+      </div>
+      <div>
+        <label>Footer link URL</label>
+        <input type="text" name="footer_url" value="{{ BRAND.footer_url }}" required>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Logo URL (optional)</label>
+        <input type="text" name="logo_url" value="{{ BRAND.logo_url }}" placeholder="/static/logo.png or https://...">
+        <div class="hint">If provided, overrides uploaded logo below.</div>
+      </div>
+      <div>
+        <label>Or upload logo</label>
+        <input type="file" name="logo_file" accept=".png,.jpg,.jpeg,.webp,.gif">
+        <div class="hint">Stored under /static/uploads/</div>
+      </div>
+    </div>
+
+    <button type="submit">Save Branding</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Team: {{ team_name }}</h1>
+<form method="post" action="/admin/org/team/{{ team_name }}/permissions" onsubmit="return submitPerms(this)">
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>Label</th><th>Can View</th><th>Can Create</th></tr></thead>
+      <tbody>
+      {% for lbl, perms in perm_map.items() %}
+        <tr>
+          <td>{{ lbl }}</td>
+          <td><input type="checkbox" name="cv_{{ lbl }}" {% if perms.view %}checked{% endif %}></td>
+          <td><input type="checkbox" name="cc_{{ lbl }}" {% if perms.create %}checked{% endif %}></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <input type="hidden" name="payload" id="payload">
+    <div style="margin-top:10px"><button type="submit">Save</button></div>
+  </div>
+</form>
+<script>
+function submitPerms(form){
+  const data = {};
+  {% for lbl, _ in perm_map.items() %}
+    data["{{ lbl }}"] = { view: form["cv_{{ lbl }}"].checked, create: form["cc_{{ lbl }}"].checked };
+  {% endfor %}
+  form.payload.value = JSON.stringify(data);
+  return true;
+}
+</script>
+{% endblock %}

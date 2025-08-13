@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Label Permissions</h1>
+<div class="card">
+  <p class="muted">Admins always have full access. If a user has no rows here, they default to full access.</p>
+  <form id="permForm" method="post" action="/admin/permissions/save">
+    <input type="hidden" name="payload" id="payload">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          {% for lbl in ALLOWED_LABELS %}
+            <th>{{ lbl }}<br><small class="muted">view / create</small></th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.name or u.username }}</td>
+          {% for lbl in ALLOWED_LABELS %}
+          {% set p = (perm_map.get(u.id, {}).get(lbl) or {}) %}
+          <td>
+            <label><input type="checkbox" data-user="{{ u.id }}" data-label="{{ lbl }}" data-kind="view" {% if p.get('view', 1) %}checked{% endif %}> view</label><br>
+            <label><input type="checkbox" data-user="{{ u.id }}" data-label="{{ lbl }}" data-kind="create" {% if p.get('create', 1) %}checked{% endif %}> create</label>
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <br>
+    <button type="submit">Save permissions</button>
+  </form>
+</div>
+<script>
+  const form = document.getElementById('permForm');
+  form.addEventListener('submit', () => {
+    const rows = {};
+    document.querySelectorAll('input[type=checkbox][data-user]').forEach(ch => {
+      const uid = ch.getAttribute('data-user');
+      const lbl = ch.getAttribute('data-label');
+      const kind = ch.getAttribute('data-kind');
+      rows[uid] = rows[uid] || {};
+      rows[uid][lbl] = rows[uid][lbl] || {};
+      rows[uid][lbl][kind] = ch.checked ? 1 : 0;
+    });
+    document.getElementById('payload').value = JSON.stringify(rows);
+  });
+</script>
+{% endblock %}
